@@ -1,52 +1,73 @@
 import requests
+import datetime
+import json
+from collections import defaultdict
 from disco.types.message import MessageEmbed
+from threading import Timer
 import constants
 
 
-KEYS = {}
+KEYS = defaultdict(dict)
+AFFIXES = {}
 
 
 def get_weekly_affix():
-    r = requests.get(constants.AFFIX_URL)
-    return r.json()
+    'Getting new data...'
+    r = requests.get(constants.AFFIX_URL, timeout=2)
+    global AFFIXES
+    AFFIXES = r.json()
+    print 'Got data:'
+    print json.dumps(AFFIXES, indent=4)
+    global KEYS
+    KEYS = defaultdict(dict)
+    cache()
 
 
-def generate_embed():
+def cache():
+    print 'Caching...'
+    d = datetime.datetime.now()
+    reset = d + datetime.timedelta(days=(1-d.weekday() + 7) % 7)
+    reset = reset.replace(hour=16, minute=0, second=0, microsecond=0)
+    print 'Will reset data on {}'.format(reset)
+    seconds_to_wait = (reset - d).total_seconds()
+    t = Timer(seconds_to_wait, get_weekly_affix)
+    t.start()
+
+
+def generate_embed(guild_id):
     embed = MessageEmbed()
-    data = get_weekly_affix()
     keys = ''
 
-    for name, key in KEYS.items():
+    for name, key in KEYS[guild_id].items():
         for dungeon, level in key.items():
             keys += '\n{} ({}) - [{}]'.format(dungeon, level, name)
 
-    embed.add_field(name='Keys', value=keys)
+    if keys:
+        embed.add_field(name='Current Keys', value=keys)
 
-    for affix in data['affix_details']:
+    for affix in AFFIXES['affix_details']:
         embed.add_field(name=affix['name'], value=affix['description'])
 
-    embed.timestamp = '2017-11-28T23:42:41.752Z'
     embed.set_author(name='Mythic Keystones',
                      url=constants.GITHUB_URL,
                      icon_url=constants.KEYSTONE_ICON_URL)
-    embed.set_footer(text='Current Keystones',
-                     icon_url=constants.GITHUB_ICON_URL)
+
     print embed
     return embed
 
 
-def add_key(name, level, dungeon):
-    KEYS[name] = {
+def add_key(name, level, dungeon, guild_id):
+    KEYS[guild_id][name] = {
         constants.DUNGEON_LIST[dungeon]: level
     }
-    return generate_embed()
+    return generate_embed(guild_id)
 
 
-def remove_key(name):
-    if name in KEYS:
-        del KEYS[name]
-    return generate_embed()
+def remove_key(name, guild_id):
+    if name in KEYS[guild_id]:
+        del KEYS[guild_id][name]
+    return generate_embed(guild_id)
 
 
-def list_keys():
-    return generate_embed()
+def list_keys(guild_id):
+    return generate_embed(guild_id)
