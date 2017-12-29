@@ -25,13 +25,20 @@ def get_weekly_affix():
 
 def cache():
     print 'Caching...'
-    d = datetime.datetime.now()
-    reset = d + datetime.timedelta(days=(1-d.weekday() + 7) % 7)
-    reset = reset.replace(hour=16, minute=0, second=0, microsecond=0)
-    print 'Will reset data on {}'.format(reset)
-    seconds_to_wait = (reset - d).total_seconds()
-    t = Timer(seconds_to_wait, get_weekly_affix)
-    t.start()
+    now = datetime.datetime.utcnow()
+
+    # Get datetime of next Tuesday
+    next_tuesday = now + datetime.timedelta(days=(1-now.weekday()) % 7)
+
+    # It is Tuesday my dudes
+    if now.weekday() is 1:
+        one_week = datetime.timedelta(days=7)
+        next_tuesday += one_week
+
+    print next_tuesday
+    # seconds_to_wait = (next_tuesday - now).total_seconds
+    # t = Timer(seconds_to_wait, get_weekly_affix)
+    # t.start()
 
 
 def generate_embed(guild_id):
@@ -52,11 +59,15 @@ def generate_embed(guild_id):
                      url=constants.GITHUB_URL,
                      icon_url=constants.KEYSTONE_ICON_URL)
 
-    print embed
-    return embed
+    return {'embed': embed}
 
 
 def add_key(name, level, dungeon, guild_id):
+    if dungeon not in constants.DUNGEON_LIST:
+        return {'content': '\"{}\" is not a valid dungeon. '
+                'Please use `@keystone dungeons` for a list '
+                'of valid dungeons.'.format(dungeon)}
+
     KEYS[guild_id][name] = {
         constants.DUNGEON_LIST[dungeon]: level
     }
@@ -64,10 +75,25 @@ def add_key(name, level, dungeon, guild_id):
 
 
 def remove_key(name, guild_id):
-    if name in KEYS[guild_id]:
-        del KEYS[guild_id][name]
+    if name not in KEYS[guild_id]:
+        return {'content': 'No key found for \"{}\"'.format(name)}
+
+    del KEYS[guild_id][name]
     return generate_embed(guild_id)
 
 
 def list_keys(guild_id):
     return generate_embed(guild_id)
+
+
+def export_keys():
+    with open('keys.json', 'w') as key_file:
+        json.dumps(KEYS, key_file)
+    return
+
+
+def import_keys():
+    with open('keys') as f:
+        data = json.loads(f)
+        print data
+    return
