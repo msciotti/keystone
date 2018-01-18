@@ -4,7 +4,7 @@ import helpers
 from constants import DUNGEON_LIST
 
 
-helpers.get_weekly_affix()
+helpers.cache()
 
 
 class KeystonePlugin(Plugin):
@@ -13,7 +13,7 @@ class KeystonePlugin(Plugin):
         name = character_name or event.msg.author.username
         msg_guild = event.msg.guild
         guild_id = msg_guild.id
-        response = helpers.add_key(name, level, dungeon, guild_id)
+        response = helpers.add_key(name, level, dungeon, str(guild_id))
         return event.msg.reply(**response)
 
     @Plugin.command('remove', '[character_name:str...]')
@@ -21,14 +21,14 @@ class KeystonePlugin(Plugin):
         name = character_name or event.msg.author.username
         msg_guild = event.msg.guild
         guild_id = msg_guild.id
-        response = helpers.remove_key(name, guild_id)
+        response = helpers.remove_key(name, str(guild_id))
         return event.msg.reply(**response)
 
     @Plugin.command('list')
     def on_list_keys(self, event):
         msg_guild = event.msg.guild
         guild_id = msg_guild.id
-        response = helpers.list_keys(guild_id)
+        response = helpers.list_keys(str(guild_id))
         return event.msg.reply(**response)
 
     @Plugin.command('dungeons')

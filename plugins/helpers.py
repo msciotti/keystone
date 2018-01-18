@@ -12,23 +12,16 @@ AFFIXES = {}
 TUESDAY_TIMESTAMP = datetime(2015, 1, 1, 1, 00, 00, 000)
 
 
-def get_weekly_affix():
-    now = datetime.utcnow()
-    if now > TUESDAY_TIMESTAMP:
-        'Getting new data...'
-        r = requests.get(constants.AFFIX_URL, timeout=2)
-        global AFFIXES
-        AFFIXES = r.json()
-        print 'Got data:'
-        print json.dumps(AFFIXES, indent=4)
-        global KEYS
-        KEYS = defaultdict(dict)
-        cache()
-
-    return AFFIXES
-
-
 def cache():
+    'Getting new data...'
+    r = requests.get(constants.AFFIX_URL, timeout=2)
+    global AFFIXES
+    AFFIXES = r.json()
+    print 'Got data:'
+    print json.dumps(AFFIXES, indent=4)
+    global KEYS
+    KEYS = defaultdict(dict)
+
     print 'Caching...'
     now = datetime.utcnow()
 
@@ -44,6 +37,14 @@ def cache():
     global TUESDAY_TIMESTAMP
     TUESDAY_TIMESTAMP = next_tuesday
     print 'Will reset on {}'.format(TUESDAY_TIMESTAMP)
+
+
+def get_weekly_affix():
+    now = datetime.utcnow()
+    if now > TUESDAY_TIMESTAMP:
+        cache()
+
+    return AFFIXES
 
 
 def generate_embed(guild_id):
@@ -93,13 +94,15 @@ def list_keys(guild_id):
 
 
 def export_keys():
-    with open('keys', 'w') as key_file:
-        json.dumps(KEYS, key_file)
+    with open('keys.json', 'w') as key_file:
+        json.dump(KEYS, key_file)
     return
 
 
 def import_keys():
-    with open('keys') as f:
-        data = json.loads(f)
-        print data
+    with open('keys.json', 'r') as f:
+        data = json.load(f)
+        global KEYS
+        KEYS = defaultdict(dict)
+        KEYS.update(data)
     return
