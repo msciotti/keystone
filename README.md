@@ -21,5 +21,7 @@ A Discord bot for tracking World of Warcraft mythic+ keystones. Made with the [d
 | add | adds a key |
 | remove | removes a key |
 | list | lists current keys |
+| export | exports currently saved keys |
+| import | imports previously exported keys |
 
 ![](images/example.png)

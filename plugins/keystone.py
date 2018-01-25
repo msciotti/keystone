@@ -61,10 +61,12 @@ class KeystonePlugin(Plugin):
     def on_help(self, event):
         tbl = MessageTable()
         tbl.set_header('Command', 'Description', 'Example')
-        tbl.add('dungeons', 'list dungeon abbreviations')
+        tbl.add('dungeons', 'list dungeon abbreviations', '')
         tbl.add('add', 'add a key with optional name',
                 'set hov 9 OR set hov 9 Simbra')
         tbl.add('remove', 'remove key with optional name',
                 'remove OR remove Simbra')
-        tbl.add('list', 'list available dungeons')
+        tbl.add('list', 'list available dungeons', '')
+        tbl.add('export', 'exports existing keys to a file', '')
+        tbl.add('import', 'imports previously exported keys', '')
         event.msg.reply(tbl.compile())
