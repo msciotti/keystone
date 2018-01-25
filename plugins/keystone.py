@@ -13,14 +13,14 @@ class KeystonePlugin(Plugin):
 
     @Plugin.command('add', '<dungeon:str> <level:int> [character_name:str...]')
     def on_keystone_add(self, event, dungeon, level, character_name=None):
-        name = character_name or event.msg.author.username
+        name = character_name or event.msg.member.nick
         return event.msg.reply(
             **self.keys.add_key(str(event.msg.guild.id), name, dungeon, level)
             )
 
     @Plugin.command('remove', '[character_name:str...]')
     def on_keystone_remove(self, event, character_name=None):
-        name = character_name or event.msg.author.username
+        name = character_name or event.msg.member.nick
         return event.msg.reply(
             **self.keys.remove_key(str(event.msg.guild.id), name)
             )
