@@ -1,20 +1,34 @@
 import requests
-import json
-from collections import defaultdict
+import bisect
 from datetime import datetime, timedelta
 from disco.types.message import MessageEmbed
 from constants import AFFIX_URL,  DUNGEON_LIST, GITHUB_URL, KEYSTONE_ICON_URL
 
 
+class Keystone():
+    owner = ''
+    dungeon = ''
+    level = 0
+
+    def __init__(self, name, dungeon, level):
+        self.owner = name
+        self.dungeon = dungeon
+        self.level = level
+
+
 class KeystoneStorage():
-    keys = defaultdict(dict)
-    affixes = {}
-    timestamp = datetime.utcnow()
+    def __init__(self):
+        self.guilds = {}
+        self.affixes = {}
+        self.timestamp = datetime.utcnow()
+
+    def __lt__(self, other):
+        return self.level < other.level
 
     def cache(self):
         r = requests.get(AFFIX_URL, timeout=2)
         self.affixes = r.json()
-        self.keys = defaultdict(dict)
+        self.guild_keys = {}
         now = datetime.utcnow()
         next_tuesday = now + timedelta(days=(1-now.weekday()) % 7)
         if now.weekday() is 1:
@@ -29,14 +43,17 @@ class KeystoneStorage():
 
     def generate_embed(self, guild_id):
         embed = MessageEmbed()
-        keys = ''
+        names = dungeons = levels = ''
 
-        for name, key in self.keys[guild_id].items():
-            for dungeon, level in key.items():
-                keys += '\n{} ({}) - [{}]'.format(dungeon, level, name)
+        if self.guilds[guild_id]:
+            for keystone in self.guilds[guild_id]:
+                names += '\n{}'.format(keystone.owner)
+                dungeons += '\n{}'.format(keystone.dungeon)
+                levels += '\n{}'.format(keystone.level)
 
-        if keys:
-            embed.add_field(name='Current Keys', value=keys)
+            embed.add_field(name='Name', value=names, inline=True)
+            embed.add_field(name='Dungeon', value=dungeons, inline=True)
+            embed.add_field(name='Level', value=levels, inline=True)
 
         for affix in self.affixes['affix_details']:
             embed.add_field(name=affix['name'], value=affix['description'])
@@ -44,7 +61,6 @@ class KeystoneStorage():
         embed.set_author(name='Mythic Keystones',
                          url=GITHUB_URL,
                          icon_url=KEYSTONE_ICON_URL)
-
         return {'embed': embed}
 
     def add_key(self, guild_id, name, dungeon, level):
@@ -54,25 +70,25 @@ class KeystoneStorage():
                     ' of valid dungeons.'.format(dungeon)}
 
         self.check_cache()
-        self.keys[guild_id][name] = {
-            DUNGEON_LIST[dungeon]: level
-        }
+        if guild_id not in self.guilds:
+            self.guilds[guild_id] = []
+        keystone = Keystone(name, DUNGEON_LIST[dungeon], level)
+        bisect.insort_left(self.guilds[guild_id], keystone)
+
         return self.generate_embed(guild_id)
 
     def remove_key(self, guild_id, name):
-        self.check_cache()
-        if name not in self.keys[str(guild_id)]:
+        if guild_id not in self.guilds:
             return {'content': 'No key found for \"{}\"'.format(name)}
 
-        del self.keys[guild_id][name]
+        if not any(keystone.owner == name for keystone in self.guilds[guild_id]):
+            return {'content': 'No key found for \"{}\"'.format(name)}
+
+        self.check_cache()
+        for index, keystone in enumerate(self.guilds[guild_id]):
+            if keystone.owner == name:
+                index = index
+
+        del self.guilds[guild_id][index]
         return self.generate_embed(guild_id)
 
-    def export_keys(self):
-        with open('keys.json', 'w') as key_file:
-            json.dump(self.keys, key_file)
-
-    def import_keys(self):
-        with open('keys.json', 'r') as f:
-            data = json.load(f)
-            self.keys = defaultdict(dict)
-            self.keys.update(data)
