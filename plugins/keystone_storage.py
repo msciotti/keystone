@@ -1,8 +1,20 @@
 import requests
-import bisect
 from datetime import datetime, timedelta
 from disco.types.message import MessageEmbed
 from constants import AFFIX_URL,  DUNGEON_LIST, GITHUB_URL, KEYSTONE_ICON_URL
+
+
+def keystone_insort_right(a, x, lo=0, hi=None):
+    if hi is None:
+        hi = len(a)
+
+    while lo < hi:
+        mid = (lo+hi)//2
+        if a[mid].level > x.level:
+            lo = mid + 1
+        else:
+            hi = mid
+    a.insert(lo, x)
 
 
 class Keystone():
@@ -22,8 +34,10 @@ class KeystoneStorage():
         self.affixes = {}
         self.timestamp = datetime.utcnow()
 
-    def __lt__(self, other):
-        return self.level < other.level
+    def find_key_by_name(self, guild_id, name):
+        for index, keystone in enumerate(self.guilds[guild_id]):
+            if keystone.owner == name:
+                return index
 
     def cache(self):
         r = requests.get(AFFIX_URL, timeout=2)
@@ -50,8 +64,7 @@ class KeystoneStorage():
                 names += '\n{}'.format(keystone.owner)
                 dungeons += '\n{}'.format(keystone.dungeon)
                 levels += '\n{}'.format(keystone.level)
-
-            embed.add_field(name='Name', value=names, inline=True)
+            embed.add_field(name='Character', value=names, inline=True)
             embed.add_field(name='Dungeon', value=dungeons, inline=True)
             embed.add_field(name='Level', value=levels, inline=True)
 
@@ -72,8 +85,14 @@ class KeystoneStorage():
         self.check_cache()
         if guild_id not in self.guilds:
             self.guilds[guild_id] = []
+
         keystone = Keystone(name, DUNGEON_LIST[dungeon], level)
-        bisect.insort_left(self.guilds[guild_id], keystone)
+
+        if self.find_key_by_name(guild_id, name) is not None:
+            index = self.find_key_by_name(guild_id, name)
+            self.guilds[guild_id][index] = keystone
+        else:
+            keystone_insort_right(self.guilds[guild_id], keystone)
 
         return self.generate_embed(guild_id)
 
@@ -85,10 +104,8 @@ class KeystoneStorage():
             return {'content': 'No key found for \"{}\"'.format(name)}
 
         self.check_cache()
-        for index, keystone in enumerate(self.guilds[guild_id]):
-            if keystone.owner == name:
-                index = index
 
+        index = self.find_key_by_name(guild_id, name)
         del self.guilds[guild_id][index]
         return self.generate_embed(guild_id)
 
