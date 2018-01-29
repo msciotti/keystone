@@ -9,8 +9,7 @@ A Discord bot for tracking World of Warcraft mythic+ keystones. Made with the [d
 3. Clone the repo & navigate to directory
 4. `pip install disco-py`
 5. Put your token in `config.yaml`
-6. Remove/change [admin id restriction](https://github.com/msciotti/keystone/blob/master/plugins/keystone.py#L45) on importing/export
-7. Run `python -m disco.cli --config config.yaml` in terminal
+6. Run `python -m disco.cli --config config.yaml` in terminal
 
 ## Commands
 
