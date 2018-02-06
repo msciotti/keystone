@@ -42,7 +42,7 @@ class KeystoneStorage():
     def cache(self):
         r = requests.get(AFFIX_URL, timeout=2)
         self.affixes = r.json()
-        self.guild_keys = {}
+        self.guilds = {}
         now = datetime.utcnow()
         next_tuesday = now + timedelta(days=(1-now.weekday()) % 7)
         if now.weekday() is 1:
