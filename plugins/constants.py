@@ -1,17 +1,14 @@
 DUNGEON_LIST = {
-  'seat': 'Seat of the Triumvirate',
-  'brh': 'Black Rook Hold',
-  'cos': 'Court of Stars',
-  'dht': 'Darkheart Thicket',
-  'eoa': 'Eye of Azshara',
-  'hov': 'Halls of Valor',
-  'mos': 'Maw of Souls',
-  'nelth': 'Neltharion\'s Lair',
-  'arc': 'The Arcway',
-  'votw': 'Vault of the Wardens',
-  'coen': 'Cathedral of Eternal Night',
-  'lkara': 'Lower Return to Karazhan',
-  'ukara': 'Upper Return to Karazhan'
+  'waycrest': 'Waycrest Manor',
+  'shrine': 'Shrine of the Storms',
+  'fh': 'Freehold',
+  'td': 'Tol Dagor',
+  'atal': 'Atal\'Dazar',
+  'ml': 'The Motherlode',
+  'tos': 'Temple of Sethraliss',
+  'ur': 'The Underrot',
+  'sob': 'Siege of Boralus',
+  'kr': 'King\'s Rest'
 }
 
 GITHUB_URL = 'https://github.com/msciotti/keystone'
