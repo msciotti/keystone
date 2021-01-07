@@ -1,5 +1,0 @@
-token: ''
-
-bot:
-  plugins:
-      - plugins.keystone
