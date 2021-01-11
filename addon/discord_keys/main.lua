@@ -13,7 +13,6 @@ DiscordKeys:SetScript("OnEvent", function(self, event, arg1)
                 local _, _, _, _, _, _, slotLink, _, _, slotItemId = GetContainerItemInfo(container,slot);
                 if slotLink and slotLink:match("Keystone:") then
                     local item = GetContainerItemLink(container, slot);
-                    print(item)
                     CurrentKey = item;
                 end
             end
