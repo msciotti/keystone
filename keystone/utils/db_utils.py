@@ -17,20 +17,38 @@ cursor = connection.cursor()
 def get_seconds_to_reset():
     today = datetime.today()
     tuesday = today + timedelta((1-today.weekday()) % 7)
-
+    
     # total_seconds() returns a float and we just need an int for redis
-    return math.floor((tuesday-today).total_seconds())
+    ttl = math.floor((tuesday-today).total_seconds())
+
+    # If today is tuesday, hardcode to 1 week
+    if ttl == 0:
+        ttl = 604800
+
+    return ttl
 
 
-def upsert_keystone(user_id, username, dungeon, level):
+def upsert_keystone(user_id, username, dungeon, level, character=None):
+    # Our data structure in Redis looks like:
+    # {
+    #   user_id: {
+    #       character_name {
+    #           keystone_object
+    #       }        
+    #   }
+    # }
     keystone = {
         'username': username,
         'dungeon': dungeon,
-        'level': level
+        'level': level,
+        'character': character
     }
 
     ttl = get_seconds_to_reset()
-    r.setex(user_id, ttl, json.dumps(keystone))
+    current_keystones = r.get(user_id)
+    current_keystones = json.loads(current_keystones)
+    current_keystones[character] = keystone
+    r.setex(user_id, ttl, json.dumps(current_keystones))
 
 def remove_keystone(user_id):
     r.delete(user_id)
