@@ -63,16 +63,17 @@ export default class AuthorizedHome extends React.Component {
         });
     }
 
-    handleFileChange(path, stats) {
+    handleFileChange(path) {
         const {currentUser} = this.state;
 
-        const url = "https://db7303e26ae2.ngrok.io/update-keystones";
+        const url = "";
 
         const fileData = window.readFile(path);
+        const characterName = path.split("\\")[8];
 
         const body = {
             "key_data": fileData,
-            "character": "Simbra",
+            "character": characterName,
             "user_id": currentUser.id,
             "username":`${currentUser.username}#${currentUser.discriminator}`
         };
@@ -83,26 +84,23 @@ export default class AuthorizedHome extends React.Component {
             headers: {
                 "Content-Type": "application/json"
             }
-        }).then(res => res.json())
-          .then(json => console.log(json));
+        }).then(res => res.json());
     }
 
     render() {
-        let {currentUser, characters, disableSelectPath} = this.state;
-        // characters = JSON.parse(characters);
-        // characters = characters.map((character) => {
-        //     return <p>{character}</p>;
-        // });
+        let {currentUser, disableSelectPath} = this.state;        
 
         return ( currentUser == null ? <p>Loading</p> :
             (
                 <div>
                     <p>Logged in as: {`${currentUser.username}#${currentUser.discriminator}`}</p>
-                    <input type="file" onChange={this.handleDirectorySelect} disabled={disableSelectPath} />
-                    <div>
-                        <p>Syncing Keystones For:</p>
-                        {/* {characters} */}
-                    </div>
+                    {disableSelectPath ? 
+                        <p>Already tracking your characters</p> :
+                        <div>
+                            <p>Select your World of Warcraft executable</p>
+                            <input type="file" onChange={this.handleDirectorySelect} disabled={disableSelectPath} />
+                        </div>
+                    }
                 </div>
             )
         )

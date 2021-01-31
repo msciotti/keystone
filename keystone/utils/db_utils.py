@@ -46,6 +46,10 @@ def upsert_keystone(user_id, username, dungeon, level, character=None):
 
     ttl = get_seconds_to_reset()
     current_keystones = r.get(user_id)
+
+    if current_keystones is None:
+        current_keystones = '{}'
+
     current_keystones = json.loads(current_keystones)
     current_keystones[character] = keystone
     r.setex(user_id, ttl, json.dumps(current_keystones))
@@ -104,4 +108,5 @@ def get_affixes():
         r.setex('affixes_us', ttl, json.dumps(affixes))
 
     # affixes is a json string when read out of redis
+    print(affixes)
     return json.loads(affixes)

@@ -14,7 +14,7 @@ export default class AuthRedirect extends React.Component {
             "code": code
         };
 
-        const res = await fetch("https://db7303e26ae2.ngrok.io/token", {
+        const res = await fetch("", {
             method: "POST",
             body: JSON.stringify(body),
             headers: {
