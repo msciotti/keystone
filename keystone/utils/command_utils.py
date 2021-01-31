@@ -29,14 +29,18 @@ def make_list_keystone_response(keystones):
     characters = ''
     keys = ''
     levels = ''
+    discord_users = ''
     affixes = get_affixes()
 
     # In order to get 3 lists with a Discord embed
     # We create 3 inline fields with values separated by newlines
-    for key in keystones:
-        characters += f"{key['username']}\n"
-        keys += f"{key['dungeon']}\n"
-        levels += f"{key['level']}\n"
+    for users in keystones:
+        print(users)
+        for character in users:
+            discord_users += f"{users[character]['username']}\n"
+            characters += f"{users[character]['character']}\n"
+            keys += f"{users[character]['dungeon']}\n"
+            levels += f"{users[character]['level']}\n"
         
     return jsonify({
         'type': InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -51,7 +55,12 @@ def make_list_keystone_response(keystones):
                     },
                     'fields': [
                         {
-                            'name': 'Player',
+                            'name': 'Discord User',
+                            'value': discord_users,
+                            'inline': True
+                        },
+                        {
+                            'name': 'Character',
                             'value': characters,
                             'inline': True
                         },

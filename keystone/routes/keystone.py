@@ -1,12 +1,16 @@
+import requests
+import re
 from flask import Flask, request
+from flask_cors import CORS
 from discord_interactions import verify_key_decorator, InteractionType
 from utils.db_utils import upsert_keystone, remove_keystone, get_keystones_for_guild, register_user_with_guild
 from utils.command_utils import options_to_dict, make_add_keystone_response, make_remove_keystone_response, make_list_keystone_response, make_generic_response
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/keystone', methods=['POST'])
-@verify_key_decorator('f569e0c182ea0d7a1db64c3e845ad4fcbf23c3f42837d1116d334a8f8b870641')
+@verify_key_decorator('')
 def keystone_interactions():
     if request.json['type'] == InteractionType.APPLICATION_COMMAND:
         request_data = request.json
@@ -36,3 +40,40 @@ def keystone_interactions():
             return make_list_keystone_response(keystones)
             
     return make_generic_response()
+
+@app.route('/token', methods=['POST'])
+def handle_oauth2_redirect():
+    code = request.json['code']
+    if code is None:
+        return 'Could not get code', 400
+
+    data = {
+        'code': code,
+        'client_id': '385208101109760000',
+        'client_secret': '',
+        'redirect_uri': 'http://localhost:3000/redirect',
+        'grant_type': 'authorization_code',
+        'scope': 'identify'
+    }
+
+    r = requests.post('https://discord.com/api/v8/oauth2/token', data=data)
+    r.raise_for_status()
+    return r.json()
+
+@app.route('/update-keystones', methods=['POST'])
+def update_keystones_from_companion_app():
+    character = request.json['character']
+    username = request.json['username']
+    user_id = request.json['user_id']
+    key_data = request.json['key_data']
+
+    # Regex matching the format DungeonName: (Level)
+    contents_search = re.search(r'(?:Keystone: )((?:[a-zA-z]+\s{0,1})+)\s(?:\((\d+)\))', key_data)
+    if not contents_search:
+        return 'Could not get keystone', 400
+
+    dungeon = contents_search.group(1)
+    level = contents_search.group(2)
+    upsert_keystone(user_id, username, dungeon, level, character)
+    return 'Keystone saved'
+
