@@ -1,5 +1,6 @@
 import requests
 import re
+import os
 from flask import Flask, request
 from flask_cors import CORS
 from discord_interactions import verify_key_decorator, InteractionType
@@ -10,7 +11,7 @@ app = Flask(__name__)
 CORS(app)
 
 @app.route('/keystone', methods=['POST'])
-@verify_key_decorator('')
+@verify_key_decorator(os.environ.get('KEYSTONE_PUBLIC_KEY'))
 def keystone_interactions():
     if request.json['type'] == InteractionType.APPLICATION_COMMAND:
         request_data = request.json
@@ -49,8 +50,8 @@ def handle_oauth2_redirect():
 
     data = {
         'code': code,
-        'client_id': '385208101109760000',
-        'client_secret': '',
+        'client_id': os.environ.get('KEYSTONE_CLIENT_ID'),
+        'client_secret': os.environ.get('KEYSTONE_CLIENT_SECRET'),
         'redirect_uri': 'http://localhost:3000/redirect',
         'grant_type': 'authorization_code',
         'scope': 'identify'
