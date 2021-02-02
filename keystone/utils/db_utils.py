@@ -68,12 +68,12 @@ def get_keystones_for_guild(guild_id):
     '''
 
     rows = cursor.execute(query, (guild_id, )).fetchall()
-    user_ids = rows[0]
-    for id in user_ids:
-        keystone = r.get(id)
-        # keystone is a json string here
-        # We want to make it a dict
-        keystones.append(json.loads(keystone))
+    for users in rows:
+        for id in users:
+            keystone = r.get(id)
+            # keystone is a json string here
+            # We want to make it a dict
+            keystones.append(json.loads(keystone))
 
     return keystones
 
