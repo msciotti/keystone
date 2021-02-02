@@ -47,7 +47,7 @@ export default class AuthorizedHome extends React.Component {
 
     handleDirectorySelect(event) {
         const path = event.target.files[0].path;
-        window.walk(path, this.handleGetSyncedCharacters);
+        window.walk(path, this.handleGetSyncedCharacters, this.handleFileChange);
 
         localStorage.setItem("wowPath", path);
         this.setState({

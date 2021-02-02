@@ -25,12 +25,13 @@ const getDirectories = function(src, callback) {
     glob(src + '/**/DiscordKeys.lua', callback);
   };
 
-window.walk = function(dir, callback) {
+window.walk = function(dir, callback, saveFirst) {
     dir = path.dirname(dir);
     getDirectories(dir, (err, res) => {
         let characters = [];
         res.forEach(path => {
             watcher.add(path);
+            saveFirst(path);
             path = path.split("/");
             const server = path[path.length - 4];
             const character = path[path.length - 3];
