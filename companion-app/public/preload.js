@@ -2,6 +2,9 @@ const chokidar = require('chokidar');
 const fs = require('fs');
 const path = require('path');
 const glob = require('glob');
+const electron = require('electron');
+const BrowserWindow = electron.remote.BrowserWindow;
+
 let watcher; 
 
 
@@ -10,7 +13,7 @@ window.initFileWatcher = function(callback) {
         persistent: true
     });
 
-    watcher.on('change', callback);
+    watcher.on('change', path => callback(path));
 }
 
 window.readFile = function(path) {
@@ -34,5 +37,21 @@ window.walk = function(dir, callback) {
             characters.push(`${character} - ${server}`)
         });
         callback(characters);
+    });
+}
+
+let authWindow = new BrowserWindow({
+    width: 900,
+    height: 800,
+    show: false
+});
+
+window.openAuthWindow = function(url, callback) {
+    authWindow.loadURL(url);
+    authWindow.show();
+
+    authWindow.webContents.on('will-navigate', (e, url) => {
+        authWindow.close();
+        callback(url);
     });
 }

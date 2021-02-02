@@ -1,7 +1,10 @@
 {
   "name": "companion-app",
   "version": "0.1.0",
+  "author": "msciotti",
   "private": true,
+  "main": "public/electron.js",
+  "homepage": "./",
   "dependencies": {
     "@craco/craco": "^6.0.0",
     "@testing-library/jest-dom": "^5.11.4",
@@ -26,10 +29,10 @@
     "react-build": "react-scripts build",
     "react-test": "react-scripts test --env=jsdom",
     "react-eject": "react-scripts eject",
-    "electron-build": "electron-builder",
-    "release": "yarn react-build && electron-builder --publish=always",
-    "build": "yarn react-build && yarn electron-build",
-    "start": "concurrently \"cross-env BROWSER=none yarn react-start\" \"wait-on http://localhost:3000 && electron .\""
+    "start": "concurrently \"cross-env BROWSER=none yarn react-start\" \"wait-on http://localhost:3000 && electron .\"",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "build": "yarn react-build && electron-packager . keystone --overwrite"
   },
   "eslintConfig": {
     "extends": [
@@ -56,5 +59,7 @@
     "electron-builder": "^22.9.1",
     "wait-on": "^5.2.1"
   },
-  "main": "public/electron.js"
+  "build": {
+    "appId": "com.electron.masonsciotti.keystone"
+  }
 }

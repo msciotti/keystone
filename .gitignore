@@ -1,3 +1,7 @@
 *.pyc
-config.yaml
-keys.json
+companion-app/keystone-win32-x64/*
+companion-app/build/*
+.vscode/
+poetry.lock
+pyproject.toml
+companion-app/.eslintcache

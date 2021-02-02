@@ -66,7 +66,7 @@ export default class AuthorizedHome extends React.Component {
     handleFileChange(path) {
         const {currentUser} = this.state;
 
-        const url = "";
+        const url = "https://keystone.masonsciotti.com/update-keystones";
 
         const fileData = window.readFile(path);
         const characterName = path.split("\\")[8];

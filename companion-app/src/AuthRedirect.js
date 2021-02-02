@@ -4,17 +4,20 @@ import { Redirect } from 'react-router-dom';
 export default class AuthRedirect extends React.Component {
     constructor(props) {
         super(props);
+        console.log(props);
+        const { code } = props;
         this.state = {
-            isPending: true
+            isPending: true,
+            code: code
         };
     }
     async componentDidMount() {
-        const code = new URLSearchParams(this.props.location.search).get("code")
+        const code = this.props.location.state.code;
         const body = {
             "code": code
         };
 
-        const res = await fetch("", {
+        const res = await fetch("https://keystone.masonsciotti.com/token", {
             method: "POST",
             body: JSON.stringify(body),
             headers: {
@@ -30,6 +33,7 @@ export default class AuthRedirect extends React.Component {
     }
 
     render() {
-        return this.state.isPending ? (<p>Authorizing...</p>) : (<Redirect to="/authorized" />);
+        const {isPending} = this.state;
+        return isPending ? (<p>Authorizing...</p>) : (<Redirect to="/authorized" />);
     }
 }
