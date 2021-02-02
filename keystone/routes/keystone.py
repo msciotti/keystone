@@ -36,7 +36,7 @@ def keystone_interactions():
             remove_keystone(user_id)
             return make_remove_keystone_response()
 
-        elif command_data['name'] == 'list':
+        elif command_data['name'] == 'keys':
             keystones = get_keystones_for_guild(guild_id)
             return make_list_keystone_response(keystones)
             
