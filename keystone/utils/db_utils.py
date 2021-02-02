@@ -106,7 +106,7 @@ def get_affixes():
 
         ttl = get_seconds_to_reset()
         r.setex('affixes_us', ttl, json.dumps(affixes))
+        return affixes
 
     # affixes is a json string when read out of redis
-    print(affixes)
     return json.loads(affixes)

@@ -35,7 +35,6 @@ def make_list_keystone_response(keystones):
     # In order to get 3 lists with a Discord embed
     # We create 3 inline fields with values separated by newlines
     for users in keystones:
-        print(users)
         for character in users:
             discord_users += f"{users[character]['username']}\n"
             characters += f"{users[character]['character']}\n"
