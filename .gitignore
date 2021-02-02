@@ -5,3 +5,4 @@ companion-app/build/*
 poetry.lock
 pyproject.toml
 companion-app/.eslintcache
+keystone/data/keystone.db
