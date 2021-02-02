@@ -28,7 +28,6 @@ def make_remove_keystone_response():
 def make_list_keystone_response(keystones):
     characters = ''
     keys = ''
-    levels = ''
     discord_users = ''
     affixes = get_affixes()
 
@@ -38,8 +37,7 @@ def make_list_keystone_response(keystones):
         for character in users:
             discord_users += f"{users[character]['username']}\n"
             characters += f"{users[character]['character']}\n"
-            keys += f"{users[character]['dungeon']}\n"
-            levels += f"{users[character]['level']}\n"
+            keys += f"{users[character]['dungeon']} ({users[character]['level']})\n"
         
     return jsonify({
         'type': InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -66,11 +64,6 @@ def make_list_keystone_response(keystones):
                         {
                             'name': 'Key',
                             'value': keys,
-                            'inline': True
-                        },
-                        {
-                            'name': 'Level',
-                            'value': levels,
                             'inline': True
                         },
                         {
