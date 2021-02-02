@@ -52,7 +52,7 @@ def handle_oauth2_redirect():
         'code': code,
         'client_id': os.environ.get('KEYSTONE_CLIENT_ID'),
         'client_secret': os.environ.get('KEYSTONE_CLIENT_SECRET'),
-        'redirect_uri': 'http://localhost:3000/redirect',
+        'redirect_uri': 'https://keystone.masonsciotti.com/callback',
         'grant_type': 'authorization_code',
         'scope': 'identify'
     }
