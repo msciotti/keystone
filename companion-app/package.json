@@ -16,7 +16,7 @@
     "express": "^4.17.1",
     "form-data": "^3.0.0",
     "glob": "^7.1.6",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^2.6.7",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-file-picker": "0.0.6",
